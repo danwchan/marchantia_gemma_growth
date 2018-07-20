@@ -18,9 +18,9 @@ Two csv files contain the data from these papers. Importantly several changes ha
 
 * The constant concentrations of the compounds which are suffixed with "_constppm" were converted from ppm (0.2 and 0.02) to mol/L by dividing 0.001g/mol by the molar mass then multiplied by the dilution factor from 1 (0.2 or 0.02)
 * The molar ratio of the various media salts were manually entered to allow for subsequent calculation of total ion concentrations and is reported in XX_molar
-* paperID 1 refers to [Voth and Hammer 1940][1] and 2 refers to Voth 1941][2]
-* The phortoperiod "high" includes the 18-20h light and the 18h light periods
-* The ranks of the dry weight of the liverworts in the dry condition were calculated in Excel using the RANK() function
+* paperID 1 refers to [Voth and Hammer 1940][1] and 2 refers to [Voth 1941][2]
+* The photoperiod "long" includes the 18-20h light and the 18h light periods
+* The ranks of the dry weight of the liverworts omitted in the "short" photoperiod were calculated in Excel using the RANK() function
 
 ## Replication
 
