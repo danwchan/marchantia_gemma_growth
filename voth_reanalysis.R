@@ -26,7 +26,6 @@ sessionInfo() #for reproducibility
 
 #' #Reading in and Tidying Data
 #' There are two csv files which contian hand transcribed observations from the two papers I will be reanalyzing. A description of these files can be found in the github README and/or inside the comments attached to the code.
-#'
 #+ data-processing-salt , message = FALSE
 #this part of the first csv just has some information to make the process of making solutions easier
 salts_data <- read_csv("Voth_data/solutions.csv") %>%
@@ -77,10 +76,11 @@ working_data <- read_csv("Voth_data/growth_data.csv") %>%
   mutate(avg_gemma_cups = gemma_cups / n_plants, # calculate the plant per plant instead of per group (average)
          avg_area = area / n_plants,
          avg_dry_weight = dry_weight / n_plants,
-         avg_weight = weight / n_plants) %>%
+         avg_weight = weight / n_plants,
+         avg_gametophores = gametophores / n_plants) %>%
   gather(plant_measures, value, 6:11) %>%
   gather(ions_conc, concentration, 6:11) %>%
-  gather(avg_plant_measures, avg, 6:9)
+  gather(avg_plant_measures, avg, 6:10)
 
 #do we want these as factors?  
 #working_data$paperID <- parse_factor(working_data$paperID, c("Voth and Hammer 1940", "Voth 1941"))
@@ -94,26 +94,29 @@ working_data <- read_csv("Voth_data/growth_data.csv") %>%
 
 
 #' # Data visualization
-#' 
 #' ## Initial view
-#' Look at
-#' 
-
-#sel_columns <- c("avg_area", "avg_gemma_cups", "avg_dry_weight", "avg_weight")
-sel_columns <- c("avg_plant_measures", "avg")
-
-categorical_data <- working_data %>%
-  unite(sxpd, c(3,5), sep = "_") %>%
-#  spread(avg_plant_measures, avg) %>%
-  bind_cols(setNames(categorical_data[sel_columns], paste0(sel_columns,"_2")))
-  
-ggplot(categorical_data) +
-  geom_point(aes(x = concentration, y = avg, colour = sxpd)) +
+#' Look at the trends in area, weight and gemma across different ion concentrations split by the length of day by sex (original experiment divisions)
+#+ initial-plot, warning = FALSE
+ggplot(unite(working_data, sxpd, c(3,5), sep = "_"), aes(x = concentration, y = avg)) +
+  geom_point(aes(alpha = 0.5, colour = sxpd)) +
+  geom_smooth(method = lm, aes(colour = sxpd, group = sxpd, weight = 0.5)) +
   facet_grid(avg_plant_measures ~ ions_conc, scales = "free")
 
-ggplot(categorical_data) +
-  geom_point(aes(x = avg, y = avg_2, colour = sxpd)) +
-  facet_grid(avg_plant_measures ~ avg_plantmeasures_2, scales = "free")
+#' There is lots to look through and follow up with in the mega chart. I will try and pick apart things in the later sections
+#+ second-plot, warning = FALSE
+categorical_data <- working_data %>%
+  unite(sxpd, c(3,5), sep = "_") %>%
+  spread(avg_plant_measures, avg)
+#  bind_cols(setNames(categorical_data[sel_columns], paste0(sel_columns,"_2")))
 
+ggplot(categorical_data, aes(x = avg_weight, y = avg_gemma_cups)) +
+  geom_point(aes(shape = sxpd, colour = concentration)) +
+  geom_smooth(method = lm, aes(linetype = sxpd, group = sxpd, weight = 0.5)) +
+  facet_wrap("ions_conc", scales = "free")
+
+ggplot(categorical_data, aes(x = avg_weight, y = avg_gemma_cups)) +
+  geom_point(aes(shape = sxpd, colour = concentration)) +
+  geom_smooth(method = lm, aes(linetype = sxpd, group = sxpd, weight = 0.5)) +
+  facet_wrap("ions_conc", scales = "free")
 ggplot(filter(working_data, photoperiod == "long")) +
   geom_point(aes(x = PO4_conc, y = gemma_cups, colour = sex))
